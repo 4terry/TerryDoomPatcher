@@ -1,0 +1,9 @@
+*.exe
+*.obj
+*.pdb
+*.user
+*.suo
+.vs/
+Debug/
+x64/
+DOOM1.WAD
