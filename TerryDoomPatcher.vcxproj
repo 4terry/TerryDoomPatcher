@@ -127,7 +127,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="TerryDoomPatcher.c" />
+    <ClCompile Include="menu.c" />
+    <ClCompile Include="wad.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="wad.h" />

@@ -6,15 +6,13 @@
 #include "wad.h"
 
 void logo();
-lumpInfo* new_lump();
-void print_lumps(lumpInfo* head);
 
 int main()
 {
     char doomFileName[32];
-    logo();
 
     while (1) {
+        logo();
         printf("podaj nazwe pliku WAD umieszczonego w folderze z programem:\n");
         scanf("%s", doomFileName);
 
@@ -22,13 +20,10 @@ int main()
 
         FILE* doomFile = fopen(doomFileName, "rb");
         if (doomFile) {
-            int wybor = 0;
-            printf("wczytano plik DOOMa: %s\n", doomFileName);
+            system("cls");
+            logo();
             fread(&naglowek, 4, 3, doomFile);
-            printf("typ pliku: %.4s\n", naglowek.wadType);
-            printf("ilosc zasobow: %d (w bajtach: %d)\n", naglowek.numLumps, naglowek.numLumps * 16);
-            printf("pointer do zasobow: 0x%X\n", naglowek.dirPtr);
-
+            int wybor;
             lumpInfo* head = NULL;
             lumpInfo* tail = NULL;
             lumpInfo* tmp = NULL;
@@ -47,24 +42,42 @@ int main()
                     tail = tmp;
                 }
             }
+            while (doomFile) {
+                system("cls");
+                logo();
+                printf("wczytano plik DOOMa: %s\n", doomFileName);
+                printf("typ pliku: %.4s\n", naglowek.wadType);
+                printf("ilosc zasobow: %d (w bajtach: %d)\n", naglowek.numLumps, naglowek.numLumps * 16);
+                printf("pointer do zasobow: 0x%X\n", naglowek.dirPtr);
 
-            printf("1. wyswietl wszystko\n");
-            printf("2. szukaj zasobu\n");
-            printf("3. wyjscie\n");
-            scanf("%d", &wybor);
+                printf("1. wyswietl wszystko\n");
+                printf("2. szukaj zasobu\n");
+                printf("3. zmien plik\n");
+                printf("4. wyjscie\n");
+                scanf("%d", &wybor);
 
-            switch (wybor) {
-            case 1:
-                print_lumps(head);
-                break;
-            case 2:
-                break;
-            case 3:
-                return 0;
-                break;
+                switch (wybor) {
+                case 1:
+                    system("cls");
+                    print_lumps(head);
+                    printf("\n\nwcisnij enter aby wrocic do menu");
+                    while (getchar() != '\n');
+                    getchar();
+                    system("cls");
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    fclose(doomFile);
+                    break;
+                case 4:
+                    return 0;
+                    break;
+                }
             }
         }
         else {
+            system("cls");
             printf("error, nie udalo sie uzyskac dostepu do pliku\n");
         }
     }
@@ -80,20 +93,4 @@ void logo() {
     printf("  |    |\\  ___/|  | \\/|  | \\/\\___  | |    `   (  <_> |  <_> )  Y Y  \\    |     / __ \\|  | \\  \\___|   Y  \\  ___/|  | \\/\n");
     printf("  |____| \\___  >__|   |__|   / ____|/_______  /\\____/ \\____/|__|_|  /____|    (____  /__|  \\___  >___|  /\\___  >__|   \n");
     printf("             \\/              \\/             \\/                    \\/               \\/          \\/     \\/     \\/       \n");
-}
-
-lumpInfo* new_lump() {
-    lumpInfo* result = malloc(sizeof(lumpInfo));
-    result->next = NULL;
-    return result;
-}
-
-void print_lumps(lumpInfo* head) {
-    lumpInfo* tmp = head;
-
-    while (tmp != NULL) {
-        printf("nazwa zasobu: %.8s\n", tmp->lumpName);
-        printf("wielkosc zasobu w bajtach: %d\n", tmp->lumpSizeBytes);
-        tmp = tmp->next;
-    }
 }

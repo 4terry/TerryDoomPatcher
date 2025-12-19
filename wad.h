@@ -15,3 +15,6 @@ typedef struct {
 
     struct lumpInfo* next;
 } lumpInfo;
+
+lumpInfo* new_lump();
+void print_lumps(lumpInfo* head);
