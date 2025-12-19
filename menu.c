@@ -41,6 +41,7 @@ int main()
                     tail->next = tmp;
                     tail = tmp;
                 }
+                tmp->index = i+1;
             }
             while (doomFile) {
                 system("cls");
@@ -48,27 +49,24 @@ int main()
                 printf("wczytano plik DOOMa: %s\n", doomFileName);
                 printf("typ pliku: %.4s\n", naglowek.wadType);
                 printf("ilosc zasobow: %d (w bajtach: %d)\n", naglowek.numLumps, naglowek.numLumps * 16);
-                printf("pointer do zasobow: 0x%X\n", naglowek.dirPtr);
+                printf("pointer do zasobow: 0x%X\n\n", naglowek.dirPtr);
 
                 printf("1. wyswietl wszystko\n");
-                printf("2. szukaj zasobu\n");
-                printf("3. zmien plik\n");
+                printf("2. widok posortowany\n");
+                printf("3. szukaj zasobu\n");
                 printf("4. wyjscie\n");
+                while (getchar() != '\n'); //poprawic
                 scanf("%d", &wybor);
 
                 switch (wybor) {
                 case 1:
                     system("cls");
                     print_lumps(head);
-                    printf("\n\nwcisnij enter aby wrocic do menu");
-                    while (getchar() != '\n');
-                    getchar();
-                    system("cls");
                     break;
                 case 2:
-                    break;
+                    sort_lumps(head, 1);
+                    print_lumps(head);
                 case 3:
-                    fclose(doomFile);
                     break;
                 case 4:
                     return 0;
