@@ -10,6 +10,7 @@ void logo();
 int main()
 {
     char doomFileName[32];
+    char phrase[128];
 
     while (1) {
         logo();
@@ -49,14 +50,16 @@ int main()
                 printf("wczytano plik DOOMa: %s\n", doomFileName);
                 printf("typ pliku: %.4s\n", naglowek.wadType);
                 printf("ilosc zasobow: %d (w bajtach: %d)\n", naglowek.numLumps, naglowek.numLumps * 16);
-                printf("pointer do zasobow: 0x%X\n\n", naglowek.dirPtr);
+                printf("pointer do tabeli zasobow: 0x%X\n\n", naglowek.dirPtr);
 
                 printf("1. wyswietl wszystko\n");
-                printf("2. widok posortowany\n");
-                printf("3. szukaj zasobu\n");
-                printf("4. wyjscie\n");
-                while (getchar() != '\n'); //poprawic
-                scanf("%d", &wybor);
+                printf("2. exportuj zasob\n");
+                printf("3. widok posortowany\n");
+                printf("4. szukaj zasobu\n");
+                printf("5. wyjscie\n");
+                if (scanf("%d", &wybor) != 1) {
+                    while ((getchar()) != '\n');
+                }
 
                 switch (wybor) {
                 case 1:
@@ -64,12 +67,42 @@ int main()
                     print_lumps(head);
                     break;
                 case 2:
-                    sort_lumps(head, 1);
-                    print_lumps(head);
-                case 3:
+                    system("cls");
+                    char destname[128];
+                    export_lump(doomFile, head, destname);
                     break;
+                case 3:
+                    system("cls");
+                    printf("sortowanie po:\n");
+                    printf("1. rozmiarze\n");
+                    printf("2. alfabetycznie\n");
+                    while ((getchar()) != '\n');
+                    scanf("%d", &wybor);
+                    switch (wybor) {
+                    case 1:
+                        system("cls");
+                        sort_lumps(head, 1);
+                        print_lumps(head);
+                        break;
+                    case 2:
+                        system("cls");
+                        sort_lumps(head, 2);
+                        print_lumps(head);
+                        break;
+                    default:
+                        break;
+                    }
                 case 4:
+                    system("cls");
+                    printf("podaj wyszukiwana fraze: ");
+                    scanf("%s", phrase);
+                    printf("\n");
+                    find_lumps(head, phrase);
+                    break;
+                case 5:
                     return 0;
+                    break;
+                default:
                     break;
                 }
             }

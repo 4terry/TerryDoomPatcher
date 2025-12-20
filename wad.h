@@ -20,3 +20,6 @@ lumpInfo* new_lump();
 void print_lumps(lumpInfo* head);
 void switch_lumps(lumpInfo* first, lumpInfo* second);
 void sort_lumps(lumpInfo* head, int sort_type);
+void string_to_upper(char* text);
+void find_lumps(lumpInfo* head, char phrase[128]);
+void export_lump(FILE* filename, lumpInfo* lump, char* destFileName);
