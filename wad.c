@@ -12,43 +12,55 @@ lumpInfo* new_lump() {
 }
 
 void print_lumps(lumpInfo* head) {
+    system("cls");
     lumpInfo* tmp = head;
+    int c;
 
     while (tmp != NULL) {
-        printf("%d - %.8s\n", tmp->index, tmp->lumpName);
-        printf("wielkosc zasobu w bajtach: %d\n", tmp->lumpSizeBytes);
+        printf("%d - %.8s\n", tmp->lumpIndex, tmp->lumpName);
+        printf("rozmiar zasobu w bajtach: %d\n", tmp->lumpSizeBytes);
         printf("pointer do danych: 0x%X\n", tmp->lumpPtr);
         tmp = tmp->next;
     }
     printf("\n\nwcisnij enter aby wrocic do menu");
-    while (getchar() != '\n');
+    while (c = getchar() != '\n' && c != EOF);
     getchar();
     system("cls");
 }
 
 void switch_lumps(lumpInfo* first, lumpInfo* second) {
     lumpInfo tmp;
-    tmp.index = first->index;
+    tmp.lumpIndex = first->lumpIndex;
     strcpy(tmp.lumpName, first->lumpName);
     tmp.lumpPtr = first->lumpPtr;
     tmp.lumpSizeBytes = first->lumpSizeBytes;
 
-    first->index = second->index;
+    first->lumpIndex = second->lumpIndex;
     strcpy(first->lumpName, second->lumpName);
     first->lumpPtr = second->lumpPtr;
     first->lumpSizeBytes = second->lumpSizeBytes;
 
-    second->index = tmp.index;
+    second->lumpIndex = tmp.lumpIndex;
     strcpy(second->lumpName, tmp.lumpName);
     second->lumpPtr = tmp.lumpPtr;
     second->lumpSizeBytes = tmp.lumpSizeBytes;
 }
 
-void sort_lumps(lumpInfo* head, int sort_type) {
+void sort_lumps(lumpInfo* head) {
     int changed;
     int strcompare;
+    int sortType;
     lumpInfo* tmp_tail = NULL;
-    if (sort_type == 1) {
+
+    system("cls");
+    printf("sortowanie po:\n");
+    printf("1. rozmiarze zasobu\n");
+    printf("2. alfabetycznie\n");
+    printf("3. indeksie\n");
+    while ((getchar()) != '\n');
+    scanf("%d", &sortType);
+
+    if (sortType == 1) {
         do {
             lumpInfo* tmp = head;
             changed = 0;
@@ -61,13 +73,26 @@ void sort_lumps(lumpInfo* head, int sort_type) {
             }
         } while (changed);
     }
-    if (sort_type == 2) {
+    if (sortType == 2) {
         do {
             lumpInfo* tmp = head;
             changed = 0;
             while (tmp->next != tmp_tail) {
                 strcompare = strcmp(tmp->lumpName, tmp->next->lumpName);
                 if (strcompare > 0) {
+                    switch_lumps(tmp, tmp->next);
+                    changed = 1;
+                }
+                tmp = tmp->next;
+            }
+        } while (changed);
+    }
+    if (sortType == 3) {
+        do {
+            lumpInfo* tmp = head;
+            changed = 0;
+            while (tmp->next != tmp_tail) {
+                if (tmp->lumpIndex < tmp->next->lumpIndex) {
                     switch_lumps(tmp, tmp->next);
                     changed = 1;
                 }
@@ -109,6 +134,7 @@ void find_lumps(lumpInfo* head, char phrase[128]) {
 }
 
 void export_lump(FILE* filename, lumpInfo* head) {
+    system("cls");
     lumpInfo* tmp = head;
     char phrase[128];
     char destFileName[128];

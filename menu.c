@@ -42,7 +42,7 @@ int main()
                     tail->next = tmp;
                     tail = tmp;
                 }
-                tmp->index = i+1;
+                tmp->lumpIndex = i+1;
             }
             while (doomFile) {
                 system("cls");
@@ -63,35 +63,15 @@ int main()
 
                 switch (wybor) {
                 case 1:
-                    system("cls");
                     print_lumps(head);
                     break;
                 case 2:
-                    system("cls");
-                    char destname[128];
-                    export_lump(doomFile, head, destname);
+                    export_lump(doomFile, head);
                     break;
                 case 3:
-                    system("cls");
-                    printf("sortowanie po:\n");
-                    printf("1. rozmiarze\n");
-                    printf("2. alfabetycznie\n");
-                    while ((getchar()) != '\n');
-                    scanf("%d", &wybor);
-                    switch (wybor) {
-                    case 1:
-                        system("cls");
-                        sort_lumps(head, 1);
-                        print_lumps(head);
-                        break;
-                    case 2:
-                        system("cls");
-                        sort_lumps(head, 2);
-                        print_lumps(head);
-                        break;
-                    default:
-                        break;
-                    }
+                    sort_lumps(head);
+                    print_lumps(head);
+                    break;
                 case 4:
                     system("cls");
                     printf("podaj wyszukiwana fraze: ");
