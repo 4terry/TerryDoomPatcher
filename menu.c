@@ -19,7 +19,7 @@ int main()
 
         wadHeader naglowek;
 
-        FILE* doomFile = fopen(doomFileName, "rb");
+        FILE* doomFile = fopen(doomFileName, "r+b");
         if (doomFile) {
             system("cls");
             logo();
@@ -54,9 +54,11 @@ int main()
 
                 printf("1. wyswietl wszystko\n");
                 printf("2. exportuj zasob\n");
-                printf("3. widok posortowany\n");
-                printf("4. szukaj zasobu\n");
-                printf("5. wyjscie\n");
+                printf("3. importuj zasob\n");
+                printf("4. widok posortowany\n");
+                printf("5. szukaj zasobu\n");
+                printf("6. exportuj caly plik .WAD\n");
+                printf("7. wyjscie\n");
                 if (scanf("%d", &wybor) != 1) {
                     while ((getchar()) != '\n');
                 }
@@ -69,17 +71,23 @@ int main()
                     export_lump(doomFile, head);
                     break;
                 case 3:
+                    import_lump(doomFile, head, naglowek.dirPtr);
+                    break;
+                case 4:
                     sort_lumps(head);
                     print_lumps(head);
                     break;
-                case 4:
+                case 5:
                     system("cls");
                     printf("podaj wyszukiwana fraze: ");
                     scanf("%s", phrase);
                     printf("\n");
                     find_lumps(head, phrase);
                     break;
-                case 5:
+                case 6:
+
+                    break;
+                case 7:
                     return 0;
                     break;
                 default:

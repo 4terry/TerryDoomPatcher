@@ -22,4 +22,5 @@ void switch_lumps(lumpInfo* first, lumpInfo* second);
 void sort_lumps(lumpInfo* head);
 void string_to_upper(char* text);
 void find_lumps(lumpInfo* head, char phrase[128]);
-void export_lump(FILE* filename, lumpInfo* lump);
+void export_lump(FILE* wadFile, lumpInfo* head);
+void import_lump(FILE* wadFile, lumpInfo* head, int32_t lumpsDir);

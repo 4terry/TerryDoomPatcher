@@ -122,6 +122,8 @@ void find_lumps(lumpInfo* head, char phrase[128]) {
         char* wynik = strstr(tempName, phrase);
         if (wynik != NULL) {
             printf("%s\n", tempName);
+            printf("rozmiar zasobu w bajtach: %d\n", tmp->lumpSizeBytes);
+            printf("pointer do danych: 0x%X\n", tmp->lumpPtr);
             licznik++;
         }
         tmp = tmp->next;
@@ -133,7 +135,7 @@ void find_lumps(lumpInfo* head, char phrase[128]) {
     system("cls");
 }
 
-void export_lump(FILE* filename, lumpInfo* head) {
+void export_lump(FILE* wadFile, lumpInfo* head) {
     system("cls");
     lumpInfo* tmp = head;
     char phrase[128];
@@ -151,9 +153,9 @@ void export_lump(FILE* filename, lumpInfo* head) {
             found = 1;
             printf("podaj nazwe pliku wyjsciowego: ");
             scanf("%s", destFileName);
-            fseek(filename, tmp->lumpPtr, SEEK_SET);
+            fseek(wadFile, tmp->lumpPtr, SEEK_SET);
             unsigned char *buffor = malloc(tmp->lumpSizeBytes);
-            fread(buffor, tmp->lumpSizeBytes, 1, filename);
+            fread(buffor, tmp->lumpSizeBytes, 1, wadFile);
             FILE* destFile = fopen(destFileName, "wb");
             fwrite(buffor, tmp->lumpSizeBytes, 1, destFile);
             fclose(destFile);
@@ -164,6 +166,117 @@ void export_lump(FILE* filename, lumpInfo* head) {
     if (found == 0) {
         printf("nie znaleziono podanej frazy\n");
     }
+    printf("\n\nwcisnij enter aby wrocic do menu");
+    while (getchar() != '\n');
+    getchar();
+    system("cls");
+}
+
+void import_lump(FILE* wadFile, lumpInfo* head, int32_t lumpsDir) {
+    system("cls");
+
+    if (wadFile == NULL) {
+        printf("blad: plik wad nie jest otwarty");
+        while (getchar() != '\n');
+        getchar();
+        return;
+    }
+
+    lumpInfo* tmp = head;
+    char importFileName[128];
+    char lumpName[128];
+    int found = 0;
+    printf("podaj nazwe pliku do importu:\n");
+    scanf("%s", importFileName);
+    printf("podaj nazwe zasobu do podmienienia:\n");
+    scanf("%s", lumpName);
+    string_to_upper(lumpName);
+
+    lumpInfo* checkNode = head;
+    int exists = 0;
+    while (checkNode != NULL) {
+        char safeName[9];
+        strncpy(safeName, checkNode->lumpName, 8);
+        safeName[8] = '\0';
+        if (strcmp(safeName, lumpName) == 0) {
+            exists = 1;
+            break;
+        }
+        checkNode = checkNode->next;
+    }
+    if (exists == 0) {
+        printf("nie znaleziono zasobu %s", lumpName);
+        printf("wcisnij enter aby wrocic");
+        while (getchar() != '\n'); getchar();
+        return;
+    }
+
+    
+    FILE* importFile = fopen(importFileName, "rb");
+    if (importFile == NULL) {
+        printf("nie znaleziono pliku na dysku");
+        return;
+    }
+    fseek(importFile, 0, SEEK_END);
+    int importSize = ftell(importFile);
+    fseek(importFile, 0, SEEK_SET);
+
+    unsigned char* buffer = (unsigned char*)malloc(importSize);
+    fread(buffer, importSize, 1, importFile);
+    fclose(importFile);
+
+    int32_t actualDirPos;
+    fseek(wadFile, 8, SEEK_SET);
+    fread(&actualDirPos, 4, 1, wadFile);
+
+    fflush(wadFile);
+    fseek(wadFile, actualDirPos, SEEK_SET);
+    fwrite(buffer, 1, importSize, wadFile);
+    free(buffer);
+    int32_t newDirPtr = ftell(wadFile);
+
+    lumpInfo* updater = head;
+    int updateCount = 0;
+    
+    while (updater != NULL) {
+        char safeName[9];
+        strncpy(safeName, updater->lumpName, 8);
+        safeName[8] = '\0';
+
+        if (strcmp(safeName, lumpName) == 0) {
+            updater->lumpPtr = actualDirPos;
+            updater->lumpSizeBytes = importSize;
+            updateCount++;
+        }
+        updater = updater->next;
+    }
+
+    lumpInfo* current = head;
+    int lumpCount = 0;
+
+    while (current != NULL) {
+        fwrite(&current->lumpPtr, 4, 1, wadFile);
+        fwrite(&current->lumpSizeBytes, 4, 1, wadFile);
+
+        char lumpNameBuffer[8];
+        memset(lumpNameBuffer, 0, 8);
+        for (int i = 0; i < 8; i++) {
+            if (current->lumpName[i] == '\0') break;
+            lumpNameBuffer[i] = current->lumpName[i];
+        }
+        fwrite(lumpNameBuffer, 1, 8, wadFile);
+        current = current->next;
+        lumpCount++;
+    }
+
+    fseek(wadFile, 4, SEEK_SET);
+    fwrite(&lumpCount, 4, 1, wadFile);
+    fwrite(&newDirPtr, 4, 1, wadFile);
+
+    printf("sukces!\n");
+
+    fflush(wadFile);
+
     printf("\n\nwcisnij enter aby wrocic do menu");
     while (getchar() != '\n');
     getchar();
